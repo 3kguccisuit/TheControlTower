@@ -1,0 +1,24 @@
+﻿<Window x:Class="TheControlTower.Windows.CreateFlightWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:TheControlTower.TemplateSelectors"
+        Title="Create Flight" Height="450" Width="400">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/TheControlTower;component/Views/CreateFlightTemplate.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <local:CreateFlightTemplateSelector 
+                x:Key="CreateFlightTemplateSelector"
+                FlightCreateTemplate="{StaticResource FlightCreateTemplate}"
+               />
+
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid>
+        <ContentControl Content="{Binding Selected}" ContentTemplateSelector="{StaticResource CreateFlightTemplateSelector}" />
+    </Grid>
+</Window>
+
