@@ -12,10 +12,10 @@ namespace TheControlTowerBLL.Managers
         public void OrderTakeoff(string id)
         {
             var flight = Get(id);
-            if (flight != null)
+            if (flight != null && flight.Status == "Ready")
             {
                 flight.OnTakeOff(); // Trigger takeoff
-                TakeOff?.Invoke(this, new FlightEventArgs(flight.Name, "Flight has taken off")); // Notify listeners
+               // TakeOff?.Invoke(this, new FlightEventArgs(flight.Name, "Flight has taken off")); // Notify listeners
             }
         }
 

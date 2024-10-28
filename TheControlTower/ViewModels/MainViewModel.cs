@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.ObjectModel;
 using System.Windows;
+using System.Windows.Controls.Primitives;
 using TheControlTower.ViewModels;
 using TheControlTower.Windows;
 using TheControlTowerBLL.Managers;
@@ -42,6 +43,7 @@ public partial class MainViewModel : ObservableObject
                 UnsubscribeFromFlightEvents(selected); // Unsubscribe from events
                 Flights.Remove(selected);
                 _controlTower.Remove(selected.ID); // Remove from ControlTower
+                RefreshFlights();
                 SelectedFlight = Flights.FirstOrDefault();
             }
         }
@@ -63,7 +65,7 @@ public partial class MainViewModel : ObservableObject
         if (isOK == true)
         {
             _controlTower.Add(viewModel.Selected.ID, viewModel.Selected); // Add to ControlTower
-            SubscribeToFlightEvents(viewModel.Selected); // Subscribe to the events
+           // SubscribeToFlightEvents(viewModel.Selected); // Subscribe to the events
             RefreshFlights();
             SelectedFlight = Flights.FirstOrDefault(f => f.Name == viewModel.Selected.Name);
            // FlightLog.Add($"Flight {viewModel.Selected.Name} added to the Control Tower.");
@@ -77,7 +79,7 @@ public partial class MainViewModel : ObservableObject
         if (selected != null)
         {
             _controlTower.OrderTakeoff(selected.ID); // Use ID to reference the flight
-            MessageBox.Show($"Flight {selected.Name} has taken off!", "Flight Status", MessageBoxButton.OK, MessageBoxImage.Information);
+            //MessageBox.Show($"Flight {selected.Name} has taken off!", "Flight Status", MessageBoxButton.OK, MessageBoxImage.Information);
         }
         else
         {
@@ -122,19 +124,21 @@ public partial class MainViewModel : ObservableObject
     // Event handler for when the flight lands
     private void OnFlightLanded(object sender, FlightEventArgs e)
     {
-        RefreshFlights();
-        // RefreshFlights(); // Refresh the flight list
         FlightLog.Add($"Flight {e.FlightName} has landed.");
+        RefreshFlights();
     }
 
     // Refresh the flight list from the ControlTower
     private void RefreshFlights()
     {
         Flights.Clear();
+        // Add flights back and subscribe to their events
         foreach (var flight in _controlTower.GetAll())
         {
-            SubscribeToFlightEvents(flight); // Subscribe to events when refreshing
             Flights.Add(flight);
+            if(flight.Status !="Landed")
+                 SubscribeToFlightEvents(flight); // Subscribe to each flight's events
         }
     }
+
 }
