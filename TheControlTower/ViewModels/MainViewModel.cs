@@ -2,8 +2,8 @@
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows;
-using System.Windows.Controls.Primitives;
 using TheControlTower.ViewModels;
 using TheControlTower.Windows;
 using TheControlTowerBLL.Managers;
@@ -24,10 +24,14 @@ public partial class MainViewModel : ObservableObject
     {
         _serviceProvider = serviceProvider;
         _controlTower = controlTower;
+
+        // Subscribe to ControlTower events
+        _controlTower.TakeOff += OnFlightTakeOff;
+        _controlTower.Landed += OnFlightLanded;
+
         RefreshFlights();
     }
 
-    // Command to Delete Flight
     [RelayCommand]
     private void DeleteFlight(Flight selected)
     {
@@ -40,7 +44,6 @@ public partial class MainViewModel : ObservableObject
 
             if (result == MessageBoxResult.Yes)
             {
-                UnsubscribeFromFlightEvents(selected); // Unsubscribe from events
                 Flights.Remove(selected);
                 _controlTower.Remove(selected.ID); // Remove from ControlTower
                 RefreshFlights();
@@ -53,7 +56,6 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    // Command to Open Flight Creation Form
     [RelayCommand]
     private void AddFlight()
     {
@@ -64,22 +66,23 @@ public partial class MainViewModel : ObservableObject
 
         if (isOK == true)
         {
-            _controlTower.Add(viewModel.Selected.ID, viewModel.Selected); // Add to ControlTower
-           // SubscribeToFlightEvents(viewModel.Selected); // Subscribe to the events
+            var newFlight = viewModel.Selected;
+
+            // Add the new flight using ControlTower's AddFlight to ensure callbacks are set
+            _controlTower.AddFlight(newFlight.ID, newFlight);
+
             RefreshFlights();
-            SelectedFlight = Flights.FirstOrDefault(f => f.Name == viewModel.Selected.Name);
-           // FlightLog.Add($"Flight {viewModel.Selected.Name} added to the Control Tower.");
+            SelectedFlight = Flights.FirstOrDefault(f => f.Name == newFlight.Name);
         }
     }
 
-    // Command to take off a flight
+
     [RelayCommand]
     private void TakeOffFlight(Flight selected)
     {
         if (selected != null)
         {
             _controlTower.OrderTakeoff(selected.ID); // Use ID to reference the flight
-            //MessageBox.Show($"Flight {selected.Name} has taken off!", "Flight Status", MessageBoxButton.OK, MessageBoxImage.Information);
         }
         else
         {
@@ -87,33 +90,6 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    [RelayCommand]
-    private void ChangeHeight(Flight selected)
-    {
-        MessageBox.Show("Please enter the new height for the flight", "Change Flight Height", MessageBoxButton.OK, MessageBoxImage.Information);
-    }
-
-    // Subscribe to the events for each flight
-    private void SubscribeToFlightEvents(Flight flight)
-    {
-        flight.FlightHeightChange += OnFlightHeightChange;
-        flight.TakeOff += OnFlightTakeOff;
-        flight.Landed += OnFlightLanded;
-    }
-
-    // Unsubscribe from the events when a flight is removed
-    private void UnsubscribeFromFlightEvents(Flight flight)
-    {
-        flight.FlightHeightChange -= OnFlightHeightChange;
-        flight.TakeOff -= OnFlightTakeOff;
-        flight.Landed -= OnFlightLanded;
-    }
-
-    // Event handler for flight height changes
-    private void OnFlightHeightChange(object sender, FlightHeightEventArgs e)
-    {
-        FlightLog.Add($"Flight {e.FlightName}'s height changed to {e.NewHeight} meters.");
-    }
 
     // Event handler for when the flight takes off
     private void OnFlightTakeOff(object sender, FlightEventArgs e)
@@ -128,17 +104,19 @@ public partial class MainViewModel : ObservableObject
         RefreshFlights();
     }
 
-    // Refresh the flight list from the ControlTower
+    // Event handler for when the flight height changes
+    private void OnFlightHeightChange(object sender, FlightHeightEventArgs e)
+    {
+        FlightLog.Add($"Flight {e.FlightName} changed altitude to {e.NewHeight} meters.");
+    }
+
     private void RefreshFlights()
     {
         Flights.Clear();
-        // Add flights back and subscribe to their events
+        // Add flights from ControlTower
         foreach (var flight in _controlTower.GetAll())
         {
             Flights.Add(flight);
-            if(flight.Status !="Landed")
-                 SubscribeToFlightEvents(flight); // Subscribe to each flight's events
         }
     }
-
 }

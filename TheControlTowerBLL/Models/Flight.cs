@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Windows;
 using System.Windows.Threading;
 
 namespace TheControlTowerBLL.Models
@@ -25,10 +24,10 @@ namespace TheControlTowerBLL.Models
             set => time = value;
         }
 
-        // Events
-        public event EventHandler<FlightEventArgs> TakeOff;
-        public event EventHandler<FlightEventArgs> Landed;
-        public event EventHandler<FlightHeightEventArgs> FlightHeightChange;
+        // Delegates to notify ControlTower of state changes
+        public Action<Flight> NotifyTakeOff { get; set; }
+        public Action<Flight> NotifyLanding { get; set; }
+        public Action<Flight, int> NotifyFlightHeightChange { get; set; }
 
         // Constructor
         public Flight(string id, string name, string destination, double time)
@@ -37,7 +36,6 @@ namespace TheControlTowerBLL.Models
             Name = name;
             Destination = destination;
             Time = time;
-            //DepartureTime = TimeOnly.FromDateTime(DateTime.Now); // Set departure time
             Status = "Ready"; // Initial status
             InFlight = false;
             dispatchTimer = new DispatcherTimer(); // Initialize the DispatcherTimer but don't start it
@@ -52,7 +50,23 @@ namespace TheControlTowerBLL.Models
             InFlight = true;
             DepartureTime = TimeOnly.FromDateTime(DateTime.Now); // Update departure time at takeoff
             dispatchTimer.Start(); // Start the timer here
-            TakeOff?.Invoke(this, new FlightEventArgs(Name, "Flight has taken off"));
+            NotifyTakeOff?.Invoke(this); // Notify ControlTower of takeoff
+        }
+
+        // Method to handle landing
+        public void OnLanding()
+        {
+            StopTimer(); // Stop the timer when the flight lands
+            Status = "Landed";
+            InFlight = false;
+            NotifyLanding?.Invoke(this); // Notify ControlTower of landing
+        }
+
+        // Method to change flight height
+        public void ChangeFlightHeight(int height)
+        {
+            FlightHeight = height;
+            NotifyFlightHeightChange?.Invoke(this, height); // Notify ControlTower of height change
         }
 
         // Stop the timer when the flight lands
@@ -66,7 +80,7 @@ namespace TheControlTowerBLL.Models
         {
             LocalTime = TimeOnly.FromDateTime(DateTime.Now);
 
-            // Check how many seconds have passed since departure
+            // Check how much time has passed since departure
             double timeLeft = (LocalTime - DepartureTime).TotalSeconds;
 
             // If sufficient time has passed, make the airplane land
@@ -75,22 +89,5 @@ namespace TheControlTowerBLL.Models
                 OnLanding();
             }
         }
-
-        // Method to trigger the Landed event
-        public void OnLanding()
-        {
-            StopTimer(); // Stop the timer when the flight lands
-            Status = "Landed";
-            InFlight = false;
-            Landed?.Invoke(this, new FlightEventArgs(Name, "Flight has landed"));
-        }
-
-        // Method to change flight height
-        public void ChangeFlightHeight(int height)
-        {
-            FlightHeight = height;
-            FlightHeightChange?.Invoke(this, new FlightHeightEventArgs(Name, height));
-        }
     }
-
 }

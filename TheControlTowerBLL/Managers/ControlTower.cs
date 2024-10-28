@@ -1,4 +1,5 @@
-﻿using TheControlTowerBLL.Models;
+﻿using System;
+using TheControlTowerBLL.Models;
 
 namespace TheControlTowerBLL.Managers
 {
@@ -8,14 +9,24 @@ namespace TheControlTowerBLL.Managers
         public event EventHandler<FlightEventArgs> Landed;
         public event EventHandler<FlightEventArgs> TakeOff;
 
+        // Method to add a flight and set up notifications
+        public void AddFlight(string id, Flight flight)
+        {
+            Add(id, flight);
+
+            // Set up notification callbacks from Flight to ControlTower
+            flight.NotifyTakeOff = OnFlightTakeOff;
+            flight.NotifyLanding = OnFlightLanded;
+        }
+
         // Orders a flight to take off using its ID
         public void OrderTakeoff(string id)
         {
             var flight = Get(id);
             if (flight != null && flight.Status == "Ready")
             {
-                flight.OnTakeOff(); // Trigger takeoff
-               // TakeOff?.Invoke(this, new FlightEventArgs(flight.Name, "Flight has taken off")); // Notify listeners
+                flight.OnTakeOff(); // Trigger takeoff in Flight
+                // TakeOff event will be triggered via OnFlightTakeOff callback
             }
         }
 
@@ -23,21 +34,23 @@ namespace TheControlTowerBLL.Managers
         public void OrderLanding(string id)
         {
             var flight = Get(id);
-            if (flight != null)
+            if (flight != null && flight.Status == "In-Flight")
             {
-                flight.OnLanding(); // Trigger landing
-                Landed?.Invoke(this, new FlightEventArgs(flight.Name, "Flight has landed")); // Notify listeners
+                flight.OnLanding(); // Trigger landing in Flight
+                // Landed event will be triggered via OnFlightLanded callback
             }
         }
 
-        // Handle flight height changes using the flight's ID
-        public void ChangeFlightHeight(string id, string height)
+        // Callback for when a flight takes off
+        private void OnFlightTakeOff(Flight flight)
         {
-            var flight = Get(id);
-            if (flight != null && int.TryParse(height, out int newHeight))
-            {
-                flight.ChangeFlightHeight(newHeight); // This will trigger the event inside the Flight class
-            }
+            TakeOff?.Invoke(this, new FlightEventArgs(flight.Name, "Flight has taken off"));
+        }
+
+        // Callback for when a flight lands
+        private void OnFlightLanded(Flight flight)
+        {
+            Landed?.Invoke(this, new FlightEventArgs(flight.Name, "Flight has landed"));
         }
     }
 }
