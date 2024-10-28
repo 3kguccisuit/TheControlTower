@@ -35,8 +35,6 @@ namespace TheControlTower.ViewModels
             {
                 // Directly initialize the Selected flight with necessary properties
                 Selected = new Flight(id, "Flight 123", "New York", 5.0); // Flight duration is set as 5 hours
-                Selected.FlightHeight = 10000; // Set initial flight height (10,000 meters)
-                Selected.DepartureTime = TimeOnly.FromDateTime(DateTime.Now.AddHours(1)); // Set departure to 1 hour from now
             }
         }
 

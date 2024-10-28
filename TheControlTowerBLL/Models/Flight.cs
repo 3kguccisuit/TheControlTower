@@ -3,6 +3,13 @@ using System.Windows.Threading;
 
 namespace TheControlTowerBLL.Models
 {
+    public delegate void FlightStatusHandler(Flight sender);
+    //public delegate void FlightHeightChangeHandler(Flight sender, int height);
+}
+
+
+namespace TheControlTowerBLL.Models
+{
     public class Flight
     {
         // Fields
@@ -25,9 +32,8 @@ namespace TheControlTowerBLL.Models
         }
 
         // Delegates to notify ControlTower of state changes
-        public Action<Flight> NotifyTakeOff { get; set; }
-        public Action<Flight> NotifyLanding { get; set; }
-        public Action<Flight, int> NotifyFlightHeightChange { get; set; }
+        public event FlightStatusHandler TakeOff;
+        public event FlightStatusHandler Landed;
 
         // Constructor
         public Flight(string id, string name, string destination, double time)
@@ -38,6 +44,7 @@ namespace TheControlTowerBLL.Models
             Time = time;
             Status = "Ready"; // Initial status
             InFlight = false;
+            FlightHeight = 0;
             dispatchTimer = new DispatcherTimer(); // Initialize the DispatcherTimer but don't start it
             dispatchTimer.Tick += DispatcherTimer_Tick;
             dispatchTimer.Interval = new TimeSpan(0, 0, 1); // 1 second = 1 hour in simulation time
@@ -49,25 +56,22 @@ namespace TheControlTowerBLL.Models
             Status = "In-Flight";
             InFlight = true;
             DepartureTime = TimeOnly.FromDateTime(DateTime.Now); // Update departure time at takeoff
+            FlightHeight = 10000;
             dispatchTimer.Start(); // Start the timer here
-            NotifyTakeOff?.Invoke(this); // Notify ControlTower of takeoff
+            TakeOff?.Invoke(this);
         }
 
         // Method to handle landing
         public void OnLanding()
         {
             StopTimer(); // Stop the timer when the flight lands
-            Status = "Landed";
+            Status = "Ready";
             InFlight = false;
-            NotifyLanding?.Invoke(this); // Notify ControlTower of landing
+            FlightHeight = 0;
+            Destination = "Home";
+            Landed?.Invoke(this);
         }
 
-        // Method to change flight height
-        public void ChangeFlightHeight(int height)
-        {
-            FlightHeight = height;
-            NotifyFlightHeightChange?.Invoke(this, height); // Notify ControlTower of height change
-        }
 
         // Stop the timer when the flight lands
         public void StopTimer()

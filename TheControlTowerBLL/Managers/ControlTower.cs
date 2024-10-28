@@ -15,8 +15,8 @@ namespace TheControlTowerBLL.Managers
             Add(id, flight);
 
             // Set up notification callbacks from Flight to ControlTower
-            flight.NotifyTakeOff = OnFlightTakeOff;
-            flight.NotifyLanding = OnFlightLanded;
+            flight.TakeOff += OnFlightTakeOff;
+            flight.Landed += OnFlightLanded;
         }
 
         // Orders a flight to take off using its ID
@@ -27,17 +27,6 @@ namespace TheControlTowerBLL.Managers
             {
                 flight.OnTakeOff(); // Trigger takeoff in Flight
                 // TakeOff event will be triggered via OnFlightTakeOff callback
-            }
-        }
-
-        // Method to land a flight using its ID
-        public void OrderLanding(string id)
-        {
-            var flight = Get(id);
-            if (flight != null && flight.Status == "In-Flight")
-            {
-                flight.OnLanding(); // Trigger landing in Flight
-                // Landed event will be triggered via OnFlightLanded callback
             }
         }
 

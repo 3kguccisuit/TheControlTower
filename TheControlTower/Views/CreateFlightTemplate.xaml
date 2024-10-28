@@ -34,26 +34,13 @@
             <TextBox Grid.Row="2" Grid.Column="1" Width="120" Text="{Binding Destination}" />
 
             <!-- Duration -->
-            <Label Grid.Row="3" Grid.Column="0" Margin="3" Content="Destination" />
+            <Label Grid.Row="3" Grid.Column="0" Margin="3" Content="Duration(hrs)" />
             <TextBox Grid.Row="3" Grid.Column="1" Width="120" Text="{Binding Time}" />
 
-            <!-- Flight Height -->
+            <!-- Flight Height --><!--
             <Label Grid.Row="4" Grid.Column="0" Margin="3" Content="Flight Height" />
-            <TextBox Grid.Row="4" Grid.Column="1" Width="120" Text="{Binding FlightHeight}" />
+            <TextBox Grid.Row="4" Grid.Column="1" Width="120" Text="{Binding FlightHeight}" />-->
 
-            <!-- Departure Time -->
-            <Label Grid.Row="5" Grid.Column="0" Margin="3" Content="Departure Time" />
-            <Controls:TimePicker Grid.Row="5" Grid.Column="1" Width="120" SelectedTimeFormat="{Binding DepartureTime}" />
-
-            <!-- Status -->
-            <Label Grid.Row="6" Grid.Column="0" Margin="3" Content="Flight Status" />
-            <ComboBox Grid.Row="6" Grid.Column="1" Width="120"
-                  ItemsSource="{Binding DataContext.Statuses, RelativeSource={RelativeSource AncestorType=Window}}"
-                  SelectedItem="{Binding Status}" />
-
-            <!-- In-Flight Checkbox -->
-            <Label Grid.Row="7" Grid.Column="0" Margin="3" Content="In-Flight" />
-            <CheckBox Grid.Row="7" Grid.Column="1" IsChecked="{Binding InFlight}" />
 
             <!-- Save and Cancel Buttons -->
             <StackPanel Grid.Row="8" Grid.Column="1" Orientation="Horizontal" Margin="10,0,0,0">
