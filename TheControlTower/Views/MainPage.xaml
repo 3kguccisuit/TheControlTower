@@ -48,7 +48,7 @@
                 <Button Content="Add Flight" Command="{Binding AddFlightCommand}" Width="150" Height="35" Margin="0,0,0,10"/>
                 <Button Content="Take Off" Command="{Binding TakeOffFlightCommand}" CommandParameter="{Binding SelectedFlight}" Width="150" Height="35" Margin="0,0,0,10"/>
                 <!--<TextBox Width="150" Text="{Binding NewHeight, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,10" />-->
-                <!--<Button Content="Change Height" Command="{Binding ChangeHeightCommand}" CommandParameter="{Binding SelectedFlight}" Width="150" Height="35" Margin="0,0,0,10"/>-->
+                <Button Content="Change Height" Command="{Binding ChangeHeightCommand}" CommandParameter="{Binding SelectedFlight}" Width="150" Height="35" Margin="0,0,0,10"/>
                 <Button Content="Delete Flight" Command="{Binding DeleteFlightCommand}" CommandParameter="{Binding SelectedFlight}" Width="150" Height="35" Margin="0,10,0,0"/>
             </StackPanel>
         </Grid>

@@ -4,6 +4,7 @@ using System.Windows.Threading;
 namespace TheControlTowerBLL.Models
 {
     public delegate void FlightStatusHandler(Flight sender);
+    public delegate int AltitudeChangeHandler(Flight sender, int altitude);
     //public delegate void FlightHeightChangeHandler(Flight sender, int height);
 }
 
@@ -34,6 +35,7 @@ namespace TheControlTowerBLL.Models
         // Delegates to notify ControlTower of state changes
         public event FlightStatusHandler TakeOff;
         public event FlightStatusHandler Landed;
+        public event AltitudeChangeHandler ChangeAltitude;
 
         // Constructor
         public Flight(string id, string name, string destination, double time)
@@ -70,6 +72,15 @@ namespace TheControlTowerBLL.Models
             FlightHeight = 0;
            // Destination = "Home";
             Landed?.Invoke(this);
+        }
+
+        public int OnAltitudeChange(Flight flight, int altitude)
+        {
+            Random random = new Random();
+            int randomOffset = random.Next(-500, 500);
+            FlightHeight = altitude + randomOffset;
+            ChangeAltitude?.Invoke(this, FlightHeight);
+            return FlightHeight;
         }
 
 

@@ -8,6 +8,7 @@ using TheControlTower.ViewModels;
 using TheControlTower.Windows;
 using TheControlTowerBLL.Managers;
 using TheControlTowerBLL.Models;
+using Microsoft.VisualBasic; // Add this at the top of your file
 
 public partial class MainViewModel : ObservableObject
 {
@@ -30,7 +31,7 @@ public partial class MainViewModel : ObservableObject
         // Subscribe to ControlTower events
         _controlTower.TakeOff += OnFlightTakeOff;
         _controlTower.Landed += OnFlightLanded;
-
+        _controlTower.Altitude += OnAltitudeChange;
         RefreshFlights();
         RefreshFlightLog();
     }
@@ -93,6 +94,29 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
+    [RelayCommand]
+    private void ChangeHeight(Flight selected)
+    {
+        if (selected != null)
+        {
+            // Prompt the user for the new altitude
+            string input = Interaction.InputBox("Enter the new altitude:", "Change Altitude", "1000");
+
+            if (int.TryParse(input, out int newAltitude))
+            {
+                _controlTower.ChangeAltitude(selected, newAltitude);
+            }
+            else
+            {
+                MessageBox.Show("Please enter a valid integer.", "Invalid Input", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+        else
+        {
+            MessageBox.Show("Please select a flight", "No Flight Selected", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+    }
+
 
     // Event handler for when the flight takes off
     private void OnFlightTakeOff(object sender, FlightEventArgs e)
@@ -137,11 +161,26 @@ public partial class MainViewModel : ObservableObject
         RefreshFlights();
     }
 
-    //// Event handler for when the flight height changes
-    //private void OnFlightHeightChange(object sender, FlightHeightEventArgs e)
-    //{
-    //    FlightLog.Add($"Flight {e.FlightName} changed altitude to {e.NewHeight} meters.");
-    //}
+    private void OnAltitudeChange(object sender, FlightEventArgs e)
+    {
+        var uniqueID = Guid.NewGuid().ToString();
+        var logEntry = new FlightLog(
+            id: uniqueID,
+            flightID: e.Flight.ID,
+            flightName: e.Flight.Name,
+            message: e.Message,
+            date: DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+            destination: e.Flight.Destination
+        );
+
+        // Add log entry to FlightLogManager for persistence
+        _flightLogManager.Add(logEntry.ID, logEntry);
+
+        // Also add to the ObservableCollection for UI display
+        FlightLog.Add(logEntry);
+
+        RefreshFlights();
+    }
 
     private void RefreshFlights()
     {
