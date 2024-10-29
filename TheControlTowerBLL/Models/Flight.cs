@@ -68,7 +68,7 @@ namespace TheControlTowerBLL.Models
             Status = "Ready";
             InFlight = false;
             FlightHeight = 0;
-            Destination = "Home";
+           // Destination = "Home";
             Landed?.Invoke(this);
         }
 

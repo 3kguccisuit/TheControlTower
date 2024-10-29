@@ -54,11 +54,31 @@
         </Grid>
 
         <!-- Second Row: Flight Output (Log) -->
+        <!-- Second Row: Flight Output (Log) -->
         <Border Grid.Row="1" Grid.ColumnSpan="2" BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Height="150" Margin="10,0,10,10">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
-                <ListView ItemsSource="{Binding FlightLog}" HorizontalAlignment="Stretch"/>
+                <ListView ItemsSource="{Binding FlightLog}" HorizontalAlignment="Stretch">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock>
+                        <!-- This TextBlock will combine FlightLog properties in a single line -->
+                        <Run Text="Flight " />
+                        <Run Text="{Binding FlightName}" FontWeight="Bold" />
+                        <Run Text=" (Flight ID: " />
+                        <Run Text="{Binding FlightID}" FontWeight="Bold" />
+                        <Run Text=") has " />
+                        <Run Text="{Binding Message}" />
+                        <Run Text=" for " />
+                        <Run Text="{Binding Destination}" FontWeight="Bold"/>
+                        <Run Text=" at " />
+                        <Run Text="{Binding Date}" FontWeight="Bold" />
+                            </TextBlock>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
             </ScrollViewer>
         </Border>
+
 
     </Grid>
 </Page>

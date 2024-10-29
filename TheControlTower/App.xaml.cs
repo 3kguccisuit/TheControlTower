@@ -92,6 +92,9 @@ public partial class App : Application
         services.AddSingleton<IDictionaryManager<string, Flight>, ControlTower>();
         services.AddSingleton<ControlTower>();
 
+        services.AddSingleton<IDictionaryManager<string, FlightLog>, FlightLogManager>();
+        services.AddSingleton<FlightLogManager>();
+
         services.AddTransient<CreateFlightViewModel>();
         services.AddTransient<CreateFlightWindow>();
 

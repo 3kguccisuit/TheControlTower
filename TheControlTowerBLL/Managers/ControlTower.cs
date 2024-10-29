@@ -19,6 +19,13 @@ namespace TheControlTowerBLL.Managers
             flight.Landed += OnFlightLanded;
         }
 
+        public void RemoveFlight(Flight flight)
+        {
+            Remove(flight.ID);
+            flight.TakeOff -= OnFlightTakeOff;
+            flight.Landed -= OnFlightLanded;
+        }
+
         // Orders a flight to take off using its ID
         public void OrderTakeoff(string id)
         {
@@ -33,13 +40,14 @@ namespace TheControlTowerBLL.Managers
         // Callback for when a flight takes off
         private void OnFlightTakeOff(Flight flight)
         {
-            TakeOff?.Invoke(this, new FlightEventArgs(flight.Name, "Flight has taken off"));
+            TakeOff?.Invoke(this, new FlightEventArgs(flight, "departed"));
         }
 
         // Callback for when a flight lands
         private void OnFlightLanded(Flight flight)
         {
-            Landed?.Invoke(this, new FlightEventArgs(flight.Name, "Flight has landed"));
+            Landed?.Invoke(this, new FlightEventArgs(flight, "landed"));
+            flight.Destination = "Home";
         }
     }
 }

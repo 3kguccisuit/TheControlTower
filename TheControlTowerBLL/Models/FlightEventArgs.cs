@@ -4,12 +4,13 @@ namespace TheControlTowerBLL.Models
 {
     public class FlightEventArgs : EventArgs
     {
-        public string FlightName { get; set; }
+        public Flight Flight { get; set; }
+       // public string FlightName { get; set; }
         public string Message { get; set; }
 
-        public FlightEventArgs(string flightName, string message)
+        public FlightEventArgs(Flight flight, string message)
         {
-            FlightName = flightName;
+            Flight = flight;
             Message = message;
         }
     }

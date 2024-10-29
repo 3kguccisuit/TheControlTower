@@ -13,23 +13,26 @@ public partial class MainViewModel : ObservableObject
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ControlTower _controlTower;
+    private readonly FlightLogManager _flightLogManager;
 
     [ObservableProperty]
     private Flight selectedFlight;
 
     public ObservableCollection<Flight> Flights { get; private set; } = new ObservableCollection<Flight>();
-    public ObservableCollection<string> FlightLog { get; private set; } = new ObservableCollection<string>();
+    public ObservableCollection<FlightLog> FlightLog { get; private set; } = new ObservableCollection<FlightLog>();
 
-    public MainViewModel(IServiceProvider serviceProvider, ControlTower controlTower)
+    public MainViewModel(IServiceProvider serviceProvider, ControlTower controlTower, FlightLogManager flightLogManager)
     {
         _serviceProvider = serviceProvider;
         _controlTower = controlTower;
+        _flightLogManager = flightLogManager;
 
         // Subscribe to ControlTower events
         _controlTower.TakeOff += OnFlightTakeOff;
         _controlTower.Landed += OnFlightLanded;
 
         RefreshFlights();
+        RefreshFlightLog();
     }
 
     [RelayCommand]
@@ -45,7 +48,7 @@ public partial class MainViewModel : ObservableObject
             if (result == MessageBoxResult.Yes)
             {
                 Flights.Remove(selected);
-                _controlTower.Remove(selected.ID); // Remove from ControlTower
+                _controlTower.RemoveFlight(selected); // Remove from ControlTower
                 RefreshFlights();
                 SelectedFlight = Flights.FirstOrDefault();
             }
@@ -94,21 +97,51 @@ public partial class MainViewModel : ObservableObject
     // Event handler for when the flight takes off
     private void OnFlightTakeOff(object sender, FlightEventArgs e)
     {
-        FlightLog.Add($"Flight {e.FlightName} has taken off.");
+        var uniqueID = Guid.NewGuid().ToString();
+        var logEntry = new FlightLog(
+            id: uniqueID,
+            flightID: e.Flight.ID,
+            flightName: e.Flight.Name,
+            message: e.Message,
+            date: DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+            destination: e.Flight.Destination
+        );
+
+        // Add log entry to FlightLogManager for persistence
+        _flightLogManager.Add(logEntry.ID, logEntry);
+
+        // Also add to the ObservableCollection for UI display
+        RefreshFlights();
+        FlightLog.Add(logEntry);
     }
 
     // Event handler for when the flight lands
     private void OnFlightLanded(object sender, FlightEventArgs e)
     {
-        FlightLog.Add($"Flight {e.FlightName} has landed.");
+        var uniqueID = Guid.NewGuid().ToString();
+        var logEntry = new FlightLog(
+            id: uniqueID,
+            flightID: e.Flight.ID,
+            flightName: e.Flight.Name,
+            message: e.Message,
+            date: DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+            destination: e.Flight.Destination
+        );
+
+        // Add log entry to FlightLogManager for persistence
+        _flightLogManager.Add(logEntry.ID, logEntry);
+
+        // Also add to the ObservableCollection for UI display
+        FlightLog.Add(logEntry);
+
         RefreshFlights();
     }
 
-    // Event handler for when the flight height changes
-    private void OnFlightHeightChange(object sender, FlightHeightEventArgs e)
-    {
-        FlightLog.Add($"Flight {e.FlightName} changed altitude to {e.NewHeight} meters.");
-    }
+    //// Event handler for when the flight height changes
+    //private void OnFlightHeightChange(object sender, FlightHeightEventArgs e)
+    //{
+    //    FlightLog.Add($"Flight {e.FlightName} changed altitude to {e.NewHeight} meters.");
+    //}
 
     private void RefreshFlights()
     {
@@ -117,6 +150,17 @@ public partial class MainViewModel : ObservableObject
         foreach (var flight in _controlTower.GetAll())
         {
             Flights.Add(flight);
+        }
+
+    }
+
+    private void RefreshFlightLog()
+    {
+        FlightLog.Clear();
+        // Add flight logs from FlightLogManager
+        foreach (var logEntry in _flightLogManager.GetAll())
+        {
+            FlightLog.Add(logEntry);
         }
     }
 }
