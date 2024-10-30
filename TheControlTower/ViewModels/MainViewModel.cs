@@ -9,14 +9,14 @@ using TheControlTower.Windows;
 using TheControlTowerBLL.Managers;
 using TheControlTowerBLL.Models;
 using Microsoft.VisualBasic;
-using TheControlTowerBLL.Delegate; // Add this at the top of your file
+using TheControlTowerBLL.Delegate;
+using TheControlTower.Contracts.ViewModels;
 
-public partial class MainViewModel : ObservableObject
+public partial class MainViewModel : ObservableObject, INavigationAware
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ControlTower _controlTower;
     private readonly FlightLogManager _flightLogManager;
-    private static bool _eventsSubscribed = false;
 
     [ObservableProperty]
     private Flight selectedFlight;
@@ -29,15 +29,6 @@ public partial class MainViewModel : ObservableObject
         _serviceProvider = serviceProvider;
         _controlTower = controlTower;
         _flightLogManager = flightLogManager;
-
-        // Subscribe to ControlTower events
-        if (!_eventsSubscribed)
-        {
-            _controlTower.TakeOff += OnFlightTakeOff;
-            _controlTower.Landed += OnFlightLanded;
-            _controlTower.Altitude += OnAltitudeChange;
-            _eventsSubscribed = true;
-        }
 
         RefreshFlights();
         RefreshFlightLog();
@@ -178,6 +169,25 @@ public partial class MainViewModel : ObservableObject
         {
            FlightLog.Add(logEntry.Message);
         }
+    }
+
+    public void OnNavigatedTo(object parameter)
+    {
+        _controlTower.TakeOff += OnFlightTakeOff;
+        _controlTower.Landed += OnFlightLanded;
+        _controlTower.Altitude += OnAltitudeChange;
+        RefreshFlights();
+        RefreshFlightLog();
+    }
+
+    // Empty method to handle navigation away from the view
+    public void OnNavigatedFrom()
+    {
+        _controlTower.TakeOff -= OnFlightTakeOff;
+        _controlTower.Landed -= OnFlightLanded;
+        _controlTower.Altitude -= OnAltitudeChange;
+        RefreshFlights();
+        RefreshFlightLog();
     }
 
 }
