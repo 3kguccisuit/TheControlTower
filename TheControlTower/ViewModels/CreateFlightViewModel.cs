@@ -30,7 +30,7 @@ namespace TheControlTower.ViewModels
         // Initialize the flight with basic data
         public void Initialize(string type)
         {
-            var id = Guid.NewGuid().ToString();
+            string id = Guid.NewGuid().ToString();
             if (type == "Flight")
             {
                 // Directly initialize the Selected flight with necessary properties
@@ -58,7 +58,7 @@ namespace TheControlTower.ViewModels
         [RelayCommand]
         private void Cancel(Window window)
         {
-            var result = MessageBox.Show("Do you really want to cancel?", "Cancel Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            MessageBoxResult result = MessageBox.Show("Do you really want to cancel?", "Cancel Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (result == MessageBoxResult.Yes)
             {
                 _isCancelConfirmed = true;
@@ -77,7 +77,7 @@ namespace TheControlTower.ViewModels
             }
             else if (!_isCancelConfirmed)
             {
-                var result = MessageBox.Show("Do you really want to cancel?", "Cancel Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                MessageBoxResult result = MessageBox.Show("Do you really want to cancel?", "Cancel Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question);
                 if (result == MessageBoxResult.No)
                 {
                     e.Cancel = true;  // Prevent the window from closing

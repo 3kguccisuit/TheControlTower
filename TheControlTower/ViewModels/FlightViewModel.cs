@@ -6,6 +6,7 @@ using TheControlTowerBLL.Models;
 using TheControlTowerBLL.Managers;
 using Microsoft.Extensions.DependencyInjection;
 using TheControlTower.Windows;
+using System.Windows.Media.Media3D;
 
 
 namespace TheControlTower.ViewModels
@@ -35,9 +36,8 @@ namespace TheControlTower.ViewModels
         private void RefreshFlights()
         {
             Flights2.Clear();
-            var data = _controlTower.GetAll(); // Retrieve flights from ControlTower
-
-            foreach (var flight in data)
+            // Add flights from ControlTower
+            foreach (Flight flight in _controlTower.GetAll())
             {
                 Flights2.Add(flight);
             }

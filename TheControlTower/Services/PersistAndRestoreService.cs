@@ -25,17 +25,17 @@ public class PersistAndRestoreService : IPersistAndRestoreService
     {
         if (App.Current.Properties != null)
         {
-            var folderPath = Path.Combine(_localAppData, _appConfig.ConfigurationsFolder);
-            var fileName = _appConfig.AppPropertiesFileName;
+            string folderPath = Path.Combine(_localAppData, _appConfig.ConfigurationsFolder);
+            string fileName = _appConfig.AppPropertiesFileName;
             _fileService.Save(folderPath, fileName, App.Current.Properties);
         }
     }
 
     public void RestoreData()
     {
-        var folderPath = Path.Combine(_localAppData, _appConfig.ConfigurationsFolder);
-        var fileName = _appConfig.AppPropertiesFileName;
-        var properties = _fileService.Read<IDictionary>(folderPath, fileName);
+        string folderPath = Path.Combine(_localAppData, _appConfig.ConfigurationsFolder);
+        string fileName = _appConfig.AppPropertiesFileName;
+        IDictionary properties = _fileService.Read<IDictionary>(folderPath, fileName);
         if (properties != null)
         {
             foreach (DictionaryEntry property in properties)

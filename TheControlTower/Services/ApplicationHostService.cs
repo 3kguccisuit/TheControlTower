@@ -64,7 +64,7 @@ public class ApplicationHostService : IHostedService
 
     private async Task HandleActivationAsync()
     {
-        var activationHandler = _activationHandlers.FirstOrDefault(h => h.CanHandle());
+        IActivationHandler activationHandler = _activationHandlers.FirstOrDefault(h => h.CanHandle());
 
         if (activationHandler != null)
         {
@@ -75,7 +75,7 @@ public class ApplicationHostService : IHostedService
 
         if (App.Current.Windows.OfType<IShellWindow>().Count() == 0)
         {
-            // Default activation that navigates to the apps default page
+            // Default activation that navigates to the app's default page
             _shellWindow = _serviceProvider.GetService(typeof(IShellWindow)) as IShellWindow;
             _navigationService.Initialize(_shellWindow.GetNavigationFrame());
             _shellWindow.ShowWindow();
@@ -83,4 +83,5 @@ public class ApplicationHostService : IHostedService
             await Task.CompletedTask;
         }
     }
+
 }

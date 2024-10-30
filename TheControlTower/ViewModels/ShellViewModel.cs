@@ -37,8 +37,8 @@ public class ShellViewModel : ObservableObject
     // TODO: Change the icons and titles for all HamburgerMenuItems here.
     public ObservableCollection<HamburgerMenuItem> MenuItems { get; } = new ObservableCollection<HamburgerMenuItem>()
     {
-        new HamburgerMenuGlyphItem() { Label = Resources.ShellMainPage, Glyph = "\uE8A5", TargetPageType = typeof(MainViewModel) },
-        new HamburgerMenuGlyphItem() { Label = Resources.ShellFlightPage, Glyph = "\uE8A5", TargetPageType = typeof(FlightViewModel) },
+        new HamburgerMenuGlyphItem() { Label = Resources.ShellMainPage, Glyph = "\uE709", TargetPageType = typeof(MainViewModel) },
+        //new HamburgerMenuGlyphItem() { Label = Resources.ShellFlightPage, Glyph = "\uE8A5", TargetPageType = typeof(FlightViewModel) },
     };
 
     public ObservableCollection<HamburgerMenuItem> OptionMenuItems { get; } = new ObservableCollection<HamburgerMenuItem>()
@@ -93,7 +93,7 @@ public class ShellViewModel : ObservableObject
 
     private void OnNavigated(object sender, string viewModelName)
     {
-        var item = MenuItems
+        HamburgerMenuItem item = MenuItems
                     .OfType<HamburgerMenuItem>()
                     .FirstOrDefault(i => viewModelName == i.TargetPageType?.FullName);
         if (item != null)

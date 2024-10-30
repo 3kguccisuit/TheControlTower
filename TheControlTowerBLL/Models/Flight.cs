@@ -1,13 +1,6 @@
 ﻿using System;
 using System.Windows.Threading;
-
-namespace TheControlTowerBLL.Models
-{
-    public delegate void FlightStatusHandler(Flight sender);
-    public delegate int AltitudeChangeHandler(Flight sender, int altitude);
-    //public delegate void FlightHeightChangeHandler(Flight sender, int height);
-}
-
+using TheControlTowerBLL.Delegate;
 
 namespace TheControlTowerBLL.Models
 {

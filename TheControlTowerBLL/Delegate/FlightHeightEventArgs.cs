@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TheControlTowerBLL.Models
+namespace TheControlTowerBLL.Delegate
 {
     public class FlightHeightEventArgs : EventArgs
     {

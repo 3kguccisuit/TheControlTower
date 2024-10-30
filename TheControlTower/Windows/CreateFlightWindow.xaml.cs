@@ -15,7 +15,7 @@ namespace TheControlTower.Windows
 
             this.Closing += (sender, e) =>
             {
-                var vm = DataContext as CreateFlightViewModel;
+                CreateFlightViewModel vm = DataContext as CreateFlightViewModel;
                 if (vm != null && vm.OnWindowClosingCommand.CanExecute(e))
                 {
                     vm.OnWindowClosingCommand.Execute(e);

@@ -1,4 +1,5 @@
 ﻿using System;
+using TheControlTowerBLL.Delegate;
 using TheControlTowerBLL.Models;
 
 namespace TheControlTowerBLL.Managers
@@ -31,7 +32,7 @@ namespace TheControlTowerBLL.Managers
         // Orders a flight to take off using its ID
         public void OrderTakeoff(string id)
         {
-            var flight = Get(id);
+            Flight flight = Get(id);
             if (flight != null && flight.Status == "Ready")
             {
                 flight.OnTakeOff(); // Trigger takeoff in Flight
@@ -51,19 +52,21 @@ namespace TheControlTowerBLL.Managers
         // Callback for when a flight takes off
         private void OnFlightTakeOff(Flight flight)
         {
-            TakeOff?.Invoke(this, new FlightEventArgs(flight, "departed"));
+            TakeOff?.Invoke(this, new FlightEventArgs(flight, $"Flight: {flight.Name} (Flight ID: {flight.ID})" +
+                $" has departed for {flight.Destination} at {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}"));
         }
 
         // Callback for when a flight lands
         private void OnFlightLanded(Flight flight)
         {
-            Landed?.Invoke(this, new FlightEventArgs(flight, "landed"));
+            Landed?.Invoke(this, new FlightEventArgs(flight, $"Flight: {flight.Name} (Flight ID: {flight.ID})" +
+                $" has landed at {flight.Destination} at {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}"));
             flight.Destination = "Home";
         }
 
         private int OnChangeAltitude(Flight flight, int newAltitude)
         {
-            Altitude?.Invoke(this, new FlightEventArgs(flight, $"changed altitude to {flight.FlightHeight}"));
+            Altitude?.Invoke(this, new FlightEventArgs(flight, $"Flight: {flight.Name} has changed altitude to {flight.FlightHeight}"));
             return flight.FlightHeight;
         }
     }
